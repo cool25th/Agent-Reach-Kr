@@ -1,0 +1,100 @@
+name: Sync Upstream
+
+on:
+  # 수동 실행 (workflow_dispatch)
+  workflow_dispatch:
+
+  # 매일 한국 시간 새벽 2시에 실행 (UTC 17:00)
+  schedule:
+    - cron: '0 17 * * *'
+
+  # upstream 저장소에 새 커밋이 있을 때 실행
+  repository_dispatch:
+    types: [upstream-update]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    # GitHub PAT 필요 (upstream fetch를 위해)
+    # Settings > Secrets and variables > Actions > New repository secret
+    # Name: SYNC_TOKEN, Value: GitHub Personal Access Token (repo scope)
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/Panniantong/agent-reach.git
+
+      - name: Fetch upstream
+        run: |
+          git fetch upstream
+
+      - name: Check for updates
+        id: check_updates
+        run: |
+          LOCAL_COMMIT=$(git rev-parse HEAD)
+          UPSTREAM_COMMIT=$(git rev-parse upstream/main)
+
+          if [ "$LOCAL_COMMIT" = "$UPSTREAM_COMMIT" ]; then
+            echo "already_up_to_date=true" >> $GITHUB_OUTPUT
+            echo "Already up to date with upstream!"
+          else
+            echo "already_up_to_date=false" >> $GITHUB_OUTPUT
+            echo "Updates found from upstream"
+            git log HEAD..upstream/main --oneline
+          fi
+
+      - name: Merge upstream changes
+        if: steps.check_updates.outputs.already_up_to_date == 'false'
+        run: |
+          # Merge with strategy: accept upstream code, preserve Korean translations
+          git merge -X theirs upstream/main --no-edit 2>/dev/null || {
+            echo "Conflicts detected, resolving..."
+
+            # Resolve conflicts automatically
+            git diff --name-only --diff-filter=U | while read -r file; do
+              echo "Processing: $file"
+
+              case "$file" in
+                README.md|CHANGELOG.md|CONTRIBUTING.md|docs/*.md|agent_reach/guides/*.md|agent_reach/skill/SKILL.md|TRANSLATION_STATUS.md)
+                  echo "  → Keeping Korean translation (ours)"
+                  git checkout --ours "$file"
+                  git add "$file"
+                  ;;
+                *.py|pyproject.toml|constraints.txt|tests/*.py|scripts/*.sh)
+                  echo "  → Accepting upstream code (theirs)"
+                  git checkout --theirs "$file"
+                  git add "$file"
+                  ;;
+                *)
+                  echo "  → Manual resolution required"
+                  ;;
+              esac
+            done
+
+            # Complete merge if all conflicts resolved
+            if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
+              git commit --no-edit
+            else
+              echo "Some conflicts require manual resolution"
+              exit 1
+            fi
+          }
+
+      - name: Push changes
+        if: steps.check_updates.outputs.already_up_to_date == 'false'
+        run: |
+          git push origin main
