@@ -86,3 +86,6 @@ dmypy.json
 .idea/
 *.sublime-project
 *.sublime-workspace
+.pytest_cache/
+.agent-reach/
+*.log

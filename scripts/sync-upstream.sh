@@ -51,6 +51,11 @@ else
     git diff --name-only --diff-filter=U | while read -r file; do
         echo -e "${BLUE}Processing:${NC} ${file}"
         case "$file" in
+            .gitignore|.github/workflows/sync-upstream.yml|.github/workflows/validate-sync.yml|scripts/sync-upstream.sh|scripts/validate_sync.py|scripts/build_sync_report.py)
+                echo "  → Keeping fork sync infrastructure version"
+                git checkout --ours "$file"
+                git add "$file"
+                ;;
             README.md|CHANGELOG.md|CONTRIBUTING.md|docs/*.md|agent_reach/guides/*.md|agent_reach/skill/SKILL.md|TRANSLATION_STATUS.md)
                 echo "  → Keeping fork documentation version"
                 git checkout --ours "$file"

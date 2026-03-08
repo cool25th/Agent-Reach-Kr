@@ -69,6 +69,10 @@ jobs:
             git diff --name-only --diff-filter=U | while read -r file; do
               echo "Processing: $file"
               case "$file" in
+                .gitignore|.github/workflows/sync-upstream.yml|.github/workflows/validate-sync.yml|scripts/sync-upstream.sh|scripts/validate_sync.py|scripts/build_sync_report.py)
+                  git checkout --ours "$file"
+                  git add "$file"
+                  ;;
                 README.md|CHANGELOG.md|CONTRIBUTING.md|docs/*.md|agent_reach/guides/*.md|agent_reach/skill/SKILL.md|TRANSLATION_STATUS.md)
                   git checkout --ours "$file"
                   git add "$file"
