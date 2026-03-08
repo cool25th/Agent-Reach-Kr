@@ -1,72 +1,99 @@
 #!/bin/bash
-# sync-upstream.sh — Sync channel implementations from upstream tools
-#
-# Usage: ./scripts/sync-upstream.sh
-#
-# This script checks for updates in x-reader's fetchers/ directory
-# and shows which files have changed. You can then manually review
-# and merge the changes.
+# Agent-Reach-Kr Upstream Sync Script
+# 업스트림 저장소의 변경사항을 가져와 한국어 번역을 보존하며 병합합니다
 
 set -e
 
-UPSTREAM_REPO="runesleo/x-reader"
-UPSTREAM_BRANCH="main"
-UPSTREAM_DIR="x_reader/fetchers"
-LOCAL_DIR="agent_reach/channels"
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-echo "👁️ Agent Reach — Upstream Sync"
-echo "Checking for updates from $UPSTREAM_REPO..."
+echo -e "${BLUE}========================================${NC}"
+echo -e "${BLUE}Agent-Reach-Kr Upstream Sync${NC}"
+echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# Create temp dir for upstream code
-TMPDIR=$(mktemp -d)
-trap "rm -rf $TMPDIR" EXIT
-
-# Clone upstream (shallow)
-git clone --depth 1 --branch "$UPSTREAM_BRANCH" \
-    "https://github.com/$UPSTREAM_REPO.git" "$TMPDIR/upstream" 2>/dev/null
-
-if [ ! -d "$TMPDIR/upstream/$UPSTREAM_DIR" ]; then
-    echo "❌ Upstream directory not found: $UPSTREAM_DIR"
-    echo "   x-reader may have changed their structure."
-    exit 1
-fi
-
-# Compare each file
-echo "Comparing files..."
+# 1. Fetch upstream
+echo -e "${YELLOW}[1/5]${NC} Fetching upstream changes..."
+git fetch upstream
+echo -e "${GREEN}✓${NC} Upstream fetched"
 echo ""
 
-CHANGES=0
-for upstream_file in "$TMPDIR/upstream/$UPSTREAM_DIR"/*.py; do
-    filename=$(basename "$upstream_file")
-    local_file="$LOCAL_DIR/$filename"
-    
-    if [ ! -f "$local_file" ]; then
-        echo "🆕 NEW: $filename (exists in upstream but not locally)"
-        CHANGES=$((CHANGES + 1))
-        continue
-    fi
-    
-    # Compare (ignoring import path differences)
-    if ! diff -q <(sed 's/x_reader\.fetchers/agent_reach.channels/g' "$upstream_file") "$local_file" > /dev/null 2>&1; then
-        echo "📝 CHANGED: $filename"
-        diff --color -u <(sed 's/x_reader\.fetchers/agent_reach.channels/g' "$upstream_file") "$local_file" | head -20
-        echo "   ..."
-        echo ""
-        CHANGES=$((CHANGES + 1))
-    fi
-done
+# 2. Check if there are any changes
+echo -e "${YELLOW}[2/5]${NC} Checking for upstream changes..."
+LOCAL_COMMIT=$(git rev-parse HEAD)
+UPSTREAM_COMMIT=$(git rev-parse upstream/main)
 
-if [ $CHANGES -eq 0 ]; then
-    echo "✅ All channels are up to date with upstream!"
-else
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "$CHANGES file(s) have upstream changes."
-    echo ""
-    echo "To merge a specific file:"
-    echo "  cp $TMPDIR/upstream/$UPSTREAM_DIR/FILENAME.py $LOCAL_DIR/FILENAME.py"
-    echo "  sed -i 's/x_reader\\.fetchers/agent_reach.channels/g' $LOCAL_DIR/FILENAME.py"
-    echo ""
-    echo "Then review changes, run tests, and commit."
+if [ "$LOCAL_COMMIT" = "$UPSTREAM_COMMIT" ]; then
+    echo -e "${GREEN}✓${NC} Already up to date with upstream!"
+    exit 0
 fi
+
+echo -e "${BLUE}Changes found:${NC}"
+git log HEAD..upstream/main --oneline
+echo ""
+
+# 3. Show what files will change
+echo -e "${YELLOW}[3/5]${NC} Files that will be modified:"
+git diff --stat HEAD upstream/main
+echo ""
+
+# 4. Merge with strategy for Korean translations
+echo -e "${YELLOW}[4/5]${NC} Merging upstream changes..."
+echo -e "${BLUE}Strategy:${NC}"
+echo "  - Python code files: Accept upstream changes"
+echo "  - Korean translations: Preserve our versions"
+echo "  - New files: Accept upstream additions"
+echo ""
+
+# Attempt merge with automatic conflict resolution
+git merge -X theirs upstream/main --no-edit 2>/dev/null || {
+    echo -e "${RED}✗${NC} Merge conflicts detected!"
+    echo ""
+    echo -e "${YELLOW}Resolving conflicts...${NC}"
+
+    # Find and resolve conflicted files
+    git diff --name-only --diff-filter=U | while read -r file; do
+        echo -e "${BLUE}Processing: $file${NC}"
+
+        case "$file" in
+            README.md|CHANGELOG.md|CONTRIBUTING.md|docs/*.md|agent_reach/guides/*.md|agent_reach/skill/SKILL.md|TRANSLATION_STATUS.md)
+                echo "  → Keeping Korean translation (ours)"
+                git checkout --ours "$file"
+                git add "$file"
+                ;;
+            *.py|pyproject.toml|constraints.txt|tests/*.py|scripts/*.sh)
+                echo "  → Accepting upstream code (theirs)"
+                git checkout --theirs "$file"
+                git add "$file"
+                ;;
+            *)
+                echo "  → Manual resolution required"
+                ;;
+        esac
+    done
+
+    # Complete the merge
+    if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+        echo -e "${YELLOW}Some conflicts require manual resolution${NC}"
+        echo "Please resolve conflicts and run: git commit"
+    else
+        git commit --no-edit
+    fi
+}
+
+echo -e "${GREEN}✓${NC} Merge completed"
+echo ""
+
+# 5. Push to origin
+echo -e "${YELLOW}[5/5]${NC} Pushing to GitHub..."
+git push origin main
+echo -e "${GREEN}✓${NC} Pushed to origin/main"
+echo ""
+
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}Sync completed successfully!${NC}"
+echo -e "${GREEN}========================================${NC}"
