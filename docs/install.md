@@ -2,16 +2,16 @@
 
 ## For Humans / 사용자용
 
-Copy this to your AI Agent / 이 내용을 AI Agent에 복사하세요:
+이 문장을 AI Agent에 복사하세요:
 
-```
-帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+```text
+Agent Reach 설치 도와줘: https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/install.md
 ```
 
 > 🛡️ **Security-conscious? / 보안에 신경 쓰시나요?** Use safe mode — it won't auto-install system packages / 안전 모드를 사용하세요 — 시스템 패키지를 자동으로 설치하지 않습니다:
-> ```
-> 帮我安装 Agent Reach（安全模式）：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
-> 安装时使用 --safe 参数
+> ```text
+> Agent Reach 설치 도와줘 (안전 모드): https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/install.md
+> 설치할 때 --safe 파라미터를 사용해줘
 > ```
 
 ---
@@ -80,7 +80,7 @@ agent-reach install --env=auto --dry-run
 Shows what would be done without making any changes.
 변경 사항 없이 수행될 작업을 표시합니다.
 
-**Read the output carefully / 출력을 주의 깊게 읽은** 다음 다음을 실행하세요 / then run:
+**Read the output carefully / 출력을 주의 깊게 읽은 다음**, then run / 아래를 실행하세요:
 
 ```bash
 agent-reach doctor
@@ -154,13 +154,33 @@ mcporter config add xiaohongshu http://localhost:18060/mcp
 > 如果在服务器上，建议加代理避免 IP 风控： / 서버인 경우 IP 리스크 방지를 위해 프록시를 추가하는 것이 좋습니다:
 > `docker run -d --name xiaohongshu-mcp -p 18060:18060 -e XHS_PROXY=http://user:pass@ip:port xpzouying/xiaohongshu-mcp`
 >
-> **登录方式（优先用 Cookie-Editor，最简单）：** / **로그인 방법 (Cookie-Editor를 우선 사용, 가장 간단):**
-> 1. 用户在自己的浏览器登录小红书 (xiaohongshu.com) / 사용자가 자신의 브라우저에서 XiaoHongShu(xiaohongshu.com)에 로그인
-> 2. 用 [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) 插件导出 Cookie（Header String 格式） / [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) 확장 프로그램으로 쿠키 내보내기(Header String 형식)
-> 3. 把 Cookie 字符串发给 Agent / 쿠키 문자열을 Agent에 전송
-> 4. Agent 将 Cookie 写入 MCP 服务的 cookie 文件完成登录 / Agent가 쿠키를 MCP 서비스의 쿠키 파일에 기록하여 로그인 완료
+> **登录方式（优先用 Cookie-Editor，最简单）：** / **로그인 방법 (Cookie-Editor 우선, 가장 간단):**
+> 1. 用户在自己的浏览器登录小红书 (xiaohongshu.com) / 사용자가 자신의 브라우저에서 샤오홍슈(xiaohongshu.com)에 로그인
+> 2. 用 [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) 插件导出 Cookie（JSON 或 Header String 格式均可） / [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) 확장 프로그램으로 Cookie를 내보냅니다(JSON 또는 Header String 모두 가능)
+> 3. 把 Cookie 字符串发给 Agent / 쿠키 문자열을 Agent에 전달
+> 4. Agent 运行命令完成登录： / Agent가 아래 명령으로 로그인을 마무리합니다
 >
 > **备选：** 本地电脑如果有浏览器，也可以打开 http://localhost:18060 扫码登录。 / **대안:** 로컬 컴퓨터에 브라우저가 있는 경우 http://localhost:18060을 열어 QR 코드로 로그인할 수도 있습니다.
+
+```bash
+# JSON 格式（Cookie-Editor → Export → JSON）
+agent-reach configure xhs-cookies '[{"name":"web_session","value":"xxx","domain":".xiaohongshu.com",...}]'
+
+# 或 Header String 格式（Cookie-Editor → Export → Header String）
+agent-reach configure xhs-cookies "key1=val1; key2=val2; ..."
+```
+
+**微博 / Weibo (mcp-server-weibo) / 웨이보 (mcp-server-weibo):**
+> "微博已默认安装，装好即用。可搜索微博内容、查看热搜、获取用户动态和评论。" / "웨이보는 기본 설치 대상으로 바로 사용할 수 있습니다. 콘텐츠 검색, 인기 검색어, 사용자 피드, 댓글 조회를 지원합니다."
+
+如果自动安装失败，手动安装： / 자동 설치가 실패하면 수동으로 설치하세요:
+
+```bash
+pip install git+https://github.com/Panniantong/mcp-server-weibo.git
+mcporter config add weibo --command 'mcp-server-weibo'
+```
+
+> 无需登录、无需 Cookie、无需代理。海外服务器通常也可以直接访问。 / 로그인, Cookie, 프록시 없이 동작하며 해외 서버에서도 대체로 바로 사용할 수 있습니다.
 
 **抖音 / Douyin (douyin-mcp-server):**
 > "抖音视频解析需要一个 MCP 服务。安装 douyin-mcp-server 后即可解析视频、获取无水印下载链接。" / "Douyin 동영상 파싱에 MCP 서비스가 필요합니다. douyin-mcp-server를 설치하면 동영상을 파싱하고 워터마크 없는 다운로드 링크를 얻을 수 있습니다."
@@ -188,7 +208,7 @@ mcporter config add douyin http://localhost:18070/mcp
 ```
 
 > 无需认证即可解析视频信息和获取下载链接。 / 인증 없이 동영상 정보를 파싱하고 다운로드 링크를 얻을 수 있습니다.
-> 如需 AI 语音识别提取文案功能，需要配置硅基流动 API Key（`export API_KEY="sk-xxx"`）。 / AI 음성 인식 텍스트 추출 기능이 필요한 경우 硅基流动(지쓰둥/Groq) API Key를 구성해야 합니다(`export API_KEY="sk-xxx"`).
+> 如需 AI 语音识别提取文案功能，需要配置 SiliconFlow API Key（`export API_KEY="sk-xxx"`）。 / AI 음성 인식으로 문안을 추출하려면 SiliconFlow API Key(`export API_KEY="sk-xxx"`)를 구성해야 합니다.
 >
 > 详见 https://github.com/yzfly/douyin-mcp-server / 자세한 내용은 https://github.com/yzfly/douyin-mcp-server를 참조하세요
 
@@ -310,6 +330,7 @@ After installation, use upstream tools directly. See SKILL.md for the full comma
 | Web | `curl` + Jina | `curl -s "https://r.jina.ai/URL"` |
 | Exa Search | `mcporter` | `mcporter call 'exa.web_search_exa(...)'` |
 | 小红书 | `mcporter` | `mcporter call 'xiaohongshu.search_feeds(...)'` |
+| 微博 | `mcporter` | `mcporter call 'weibo.get_trendings(limit: 10)'` |
 | 抖音 | `mcporter` | `mcporter call 'douyin.parse_douyin_video_info(...)'` |
 | LinkedIn | `mcporter` | `mcporter call 'linkedin.get_person_profile(...)'` |
 | Boss直聘 | `mcporter` | `mcporter call 'bosszhipin.search_jobs_tool(...)'` |

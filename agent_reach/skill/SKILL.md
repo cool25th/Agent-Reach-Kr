@@ -171,7 +171,7 @@ for e in feedparser.parse('FEED_URL').entries[:5]:
 
 채널 설정이 필요한 경우 (쿠키, Docker 등), 설치 가이드를 가져오세요:
 If a channel needs setup (cookies, Docker, etc.), fetch the install guide:
-https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/install.md
 
 사용자는 쿠키만 제공합니다. 그 외 모든 것은 당신의 작업입니다.
 User only provides cookies. Everything else is your job.

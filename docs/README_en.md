@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> · <a href="../README.md">中文</a> · <a href="#supported-platforms">Platforms</a> · <a href="#design-philosophy">Philosophy</a>
+  <a href="#quick-start">Quick Start</a> · <a href="../README.md">한국어</a> · <a href="#supported-platforms">Platforms</a> · <a href="#design-philosophy">Philosophy</a>
 </p>
 
 ---
@@ -34,7 +34,7 @@ To connect your Agent to these platforms, you'd have to find tools, install depe
 **Agent Reach turns this into one command:**
 
 ```
-Install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+Install Agent Reach: https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/install.md
 ```
 
 Copy that to your Agent. A few minutes later, it can read tweets, search Reddit, and watch Bilibili.
@@ -42,7 +42,7 @@ Copy that to your Agent. A few minutes later, it can read tweets, search Reddit,
 **Already installed? Update in one command:**
 
 ```
-Update Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/update.md
+Update Agent Reach: https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/update.md
 ```
 
 ### ✅ Before you start, you might want to know
@@ -68,6 +68,7 @@ Update Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/ma
 | 💼 **LinkedIn** | Jina Reader (public pages) | Full profiles, companies, job search | Tell your Agent "help me set up LinkedIn" |
 | 🏢 **Boss直聘** | Jina Reader (job pages) | Job search, greet recruiters | Tell your Agent "help me set up Boss直聘" |
 | 💬 **WeChat Articles** | Search + Read | Zero config | Search + read WeChat Official Account articles (full Markdown) ([wechat-article-for-ai](https://github.com/bzd6661/wechat-article-for-ai) + [miku_ai](https://github.com/GobinFan/Miku_Spider)) |
+| 📰 **Weibo** | Trending · Search · Feeds · Comments | Zero config | Hot search, content/user/topic search, feeds, comments ([mcp-server-weibo](https://github.com/Panniantong/mcp-server-weibo)) |
 | 🔍 **Web Search** | Search | Auto-configured | Auto-configured during install, free, no API key ([Exa](https://exa.ai) via [mcporter](https://github.com/nicepkg/mcporter)) |
 | 📦 **GitHub** | Read · Search | Zero config | [gh CLI](https://cli.github.com) powered. Public repos work immediately. `gh auth login` unlocks Fork, Issue, PR |
 | 📺 **YouTube** | Read · **Search** | Zero config | Subtitles + search across 1800+ video sites ([yt-dlp](https://github.com/yt-dlp/yt-dlp) ⭐148K) |
@@ -84,14 +85,14 @@ Update Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/ma
 Copy this to your AI Agent (Claude Code, OpenClaw, Cursor, etc.):
 
 ```
-Install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+Install Agent Reach: https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/install.md
 ```
 
 The Agent auto-installs, detects your environment, and tells you what's ready.
 
 > 🔄 **Already installed?** Update in one command:
 > ```
-> Update Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/update.md
+> Update Agent Reach: https://raw.githubusercontent.com/cool25th/Agent-Reach-Kr/main/docs/update.md
 > ```
 
 <details>
@@ -224,6 +225,7 @@ Each channel file only checks whether its upstream tool is installed and working
 | LinkedIn | [linkedin-scraper-mcp](https://github.com/stickerdaniel/linkedin-mcp-server) | 900+ stars, MCP server, browser automation |
 | Boss直聘 | [mcp-bosszp](https://github.com/mucsbr/mcp-bosszp) | MCP server, job search + recruiter greeting |
 | WeChat Articles | [wechat-article-for-ai](https://github.com/bzd6661/wechat-article-for-ai) + [miku_ai](https://github.com/GobinFan/Miku_Spider) | Stealth browser for full article reading + Sogou search |
+| Weibo | [mcp-server-weibo](https://github.com/Panniantong/mcp-server-weibo) | Hot search, search, user feeds, and comments |
 
 > 📌 These are the *current* choices. Don't like one? Swap out the file. That's the whole point of scaffolding.
 
@@ -295,7 +297,17 @@ Install douyin-mcp-server, then your agent can use `mcporter call 'douyin.parse_
 
 ## Credits
 
-[Jina Reader](https://github.com/jina-ai/reader) · [yt-dlp](https://github.com/yt-dlp/yt-dlp) · [xreach](https://www.npmjs.com/package/xreach-cli) · [Exa](https://exa.ai) · [feedparser](https://github.com/kurtmckee/feedparser) · [douyin-mcp-server](https://github.com/yzfly/douyin-mcp-server) · [linkedin-scraper-mcp](https://github.com/stickerdaniel/linkedin-mcp-server) · [mcp-bosszp](https://github.com/mucsbr/mcp-bosszp)
+[Jina Reader](https://github.com/jina-ai/reader) · [yt-dlp](https://github.com/yt-dlp/yt-dlp) · [xreach](https://www.npmjs.com/package/xreach-cli) · [Exa](https://exa.ai) · [feedparser](https://github.com/kurtmckee/feedparser) · [mcp-server-weibo](https://github.com/Panniantong/mcp-server-weibo) · [douyin-mcp-server](https://github.com/yzfly/douyin-mcp-server) · [linkedin-scraper-mcp](https://github.com/stickerdaniel/linkedin-mcp-server) · [mcp-bosszp](https://github.com/mucsbr/mcp-bosszp)
+
+## Contact
+
+For collaboration, feature ideas, or AI Agent discussions:
+
+<p align="center">
+  <img src="wechat-qr.jpg" width="280" alt="WeChat QR">
+</p>
+
+> Please use [GitHub Issues](https://github.com/Panniantong/Agent-Reach/issues) for bugs and feature requests so they're easier to track.
 
 ## License
 
