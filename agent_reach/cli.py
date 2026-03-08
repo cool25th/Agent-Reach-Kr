@@ -73,7 +73,8 @@ def main():
     p_conf = sub.add_parser("configure", help="Set a config value or auto-extract from browser")
     p_conf.add_argument("key", nargs="?", default=None,
                         choices=["proxy", "github-token", "groq-key",
-                                 "twitter-cookies", "youtube-cookies"],
+                                 "twitter-cookies", "youtube-cookies",
+                                 "xhs-cookies"],
                         help="What to configure (omit if using --from-browser)")
     p_conf.add_argument("value", nargs="*", help="The value(s) to set")
     p_conf.add_argument("--from-browser", metavar="BROWSER",
@@ -446,8 +447,67 @@ def _install_system_deps():
             except Exception:
                 print("  -- Could not configure yt-dlp JS runtime (YouTube may not work)")
 
+    # ── Weibo (mcp-server-weibo fork with visitor passport fix) ──
+    _install_weibo_deps()
+
     # ── WeChat Articles (miku_ai + camoufox + wechat-article-for-ai) ──
     _install_wechat_deps()
+
+
+def _install_weibo_deps():
+    """Install Weibo MCP server and register it with mcporter."""
+    import shutil
+    import subprocess
+
+    print("Setting up Weibo MCP server...")
+
+    mcporter = shutil.which("mcporter")
+    if mcporter:
+        try:
+            result = subprocess.run(
+                [mcporter, "config", "list"],
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=5,
+            )
+            if "weibo" in result.stdout:
+                print("  ✅ Weibo MCP already configured")
+                return
+        except Exception:
+            pass
+
+    try:
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "-q",
+                "git+https://github.com/Panniantong/mcp-server-weibo.git",
+            ],
+            check=True,
+            timeout=120,
+        )
+        print("  ✅ mcp-server-weibo installed")
+    except Exception as exc:
+        print(f"  [!]  mcp-server-weibo install failed: {exc}")
+        return
+
+    if mcporter:
+        try:
+            subprocess.run(
+                [mcporter, "config", "add", "weibo", "--command", "mcp-server-weibo"],
+                check=True,
+                capture_output=True,
+                timeout=10,
+            )
+            print("  ✅ Weibo MCP registered with mcporter")
+        except Exception:
+            print("  [!]  mcporter config add failed. Run manually: mcporter config add weibo --command 'mcp-server-weibo'")
+    else:
+        print("  -- mcporter not found, skipping MCP registration")
 
 
 def _install_wechat_deps():
@@ -878,6 +938,11 @@ def _cmd_configure(args):
         config.set("youtube_cookies_from", value)
         print(f"✅ YouTube cookie source configured: {value}")
         print("   yt-dlp will use cookies from this browser for age-restricted/member videos.")
+
+    elif args.key == "xhs-cookies":
+        config.set("xiaohongshu_cookie_string", value)
+        print("✅ XiaoHongShu cookies configured!")
+        print("   If xiaohongshu-mcp is running, restart it so the new cookies are picked up.")
 
     elif args.key == "github-token":
         config.set("github_token", value)

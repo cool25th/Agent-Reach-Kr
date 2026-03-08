@@ -1,0 +1,39 @@
+name: Validate Sync Assumptions
+
+on:
+  push:
+    paths:
+      - "README.md"
+      - "TRANSLATION_STATUS.md"
+      - "docs/**"
+      - "agent_reach/skill/SKILL.md"
+      - "agent_reach/channels/**"
+      - "agent_reach/cli.py"
+      - "scripts/**"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "README.md"
+      - "TRANSLATION_STATUS.md"
+      - "docs/**"
+      - "agent_reach/skill/SKILL.md"
+      - "agent_reach/channels/**"
+      - "agent_reach/cli.py"
+      - "scripts/**"
+      - ".github/workflows/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run sync validation
+        env:
+          EXPECTED_REPO_SLUG: ${{ github.repository }}
+        run: |
+          python3 scripts/validate_sync.py
