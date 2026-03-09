@@ -3,7 +3,6 @@
 
 import shutil
 import subprocess
-
 from .base import Channel
 
 
@@ -15,9 +14,8 @@ class WeiboChannel(Channel):
 
     def can_handle(self, url: str) -> bool:
         from urllib.parse import urlparse
-
-        netloc = urlparse(url).netloc.lower()
-        return "weibo.com" in netloc or "weibo.cn" in netloc
+        d = urlparse(url).netloc.lower()
+        return "weibo.com" in d or "weibo.cn" in d
 
     def check(self, config=None):
         mcporter = shutil.which("mcporter")
@@ -29,16 +27,12 @@ class WeiboChannel(Channel):
                 "  3. mcporter config add weibo --command 'mcp-server-weibo'\n"
                 "  详见 https://github.com/Panniantong/mcp-server-weibo"
             )
-
         try:
-            result = subprocess.run(
-                [mcporter, "config", "list"],
-                capture_output=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=5,
+            r = subprocess.run(
+                [mcporter, "config", "list"], capture_output=True,
+                encoding="utf-8", errors="replace", timeout=5
             )
-            if "weibo" not in result.stdout:
+            if "weibo" not in r.stdout:
                 return "off", (
                     "mcporter 已装但微博 MCP 未配置。运行：\n"
                     "  pip install git+https://github.com/Panniantong/mcp-server-weibo.git\n"
@@ -46,16 +40,12 @@ class WeiboChannel(Channel):
                 )
         except Exception:
             return "off", "mcporter 连接异常"
-
         try:
-            result = subprocess.run(
-                [mcporter, "list", "weibo"],
-                capture_output=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=15,
+            r = subprocess.run(
+                [mcporter, "list", "weibo"], capture_output=True,
+                encoding="utf-8", errors="replace", timeout=15
             )
-            if result.returncode == 0 and "search_users" in result.stdout:
+            if r.returncode == 0 and "search_users" in r.stdout:
                 return "ok", "完整可用（热搜、搜索、用户动态、评论）"
             return "warn", "MCP 已配置但工具加载失败，检查 mcp-server-weibo 版本"
         except Exception:
